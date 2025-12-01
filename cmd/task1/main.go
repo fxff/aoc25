@@ -20,6 +20,9 @@ type (
 const (
 	left direction = iota
 	right
+
+	dialSize      = 100
+	startPosition = 50
 )
 
 func (m movement) apply(position int) int {
@@ -32,31 +35,34 @@ func (m movement) apply(position int) int {
 
 	return position % 100
 }
-func (m movement) apply2(startPosition int) (position, overflows int) {
-	overflows, c := m.c/100, m.c%100
+func (m movement) apply2(startPosition int) (position, zeros int) {
+	zeros, c := m.c/dialSize, m.c%dialSize
 	position = startPosition
+	// No steps
+	if c == 0 {
+		return position, zeros
+	}
+
+	// We are guaranteed to make less that dialSize steps
 	if m.d == left {
 		position -= c
 	} else {
 		position += c
 	}
-	if c == 0 {
-		return position, overflows
-	}
 
-	if position < 0 {
-		position += 100
-		if startPosition != 0 {
-			overflows++
-		}
-	} else if position >= 100 {
-		position -= 100
-		overflows++
+	if position < 0 && startPosition == 0 {
+		position += dialSize
+	} else if position < 0 {
+		position += dialSize
+		zeros++
+	} else if position >= dialSize {
+		position -= dialSize
+		zeros++
 	} else if position == 0 {
-		overflows++
+		zeros++
 	}
 
-	return position, overflows
+	return position, zeros
 }
 
 func solve(pos int, movs []movement) {
@@ -134,5 +140,5 @@ func main() {
 		panic(err)
 	}
 
-	solve2(50, movs)
+	solve2(startPosition, movs)
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 
 	"github.com/fxff/aoc25/internal/app"
@@ -74,7 +73,6 @@ func solve(input *input) int64 {
 	result := int64(0)
 	for _, row := range input.cells {
 		for i, cell := range row {
-			fmt.Print(cell.String())
 			switch cell {
 			case empty:
 				continue

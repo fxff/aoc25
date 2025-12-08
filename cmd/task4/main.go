@@ -56,6 +56,7 @@ func main() {
 	var totalRolls int64
 	for {
 		neighbours := buildNeighbours(plan)
+		// used to be simply countRolls and no loop.
 		removed := removeRolls(plan, neighbours)
 		if removed == 0 {
 			break
@@ -73,21 +74,16 @@ func buildNeighbours(plan [][]int64) [][]int64 {
 		neighbours[i] = make([]int64, w)
 	}
 
-	for i, row := range plan {
-		for j, v := range row {
-			if v == 0 {
+	for i := 0; i < h; i++ {
+		for j := 0; j < w; j++ {
+			if plan[i][j] == 0 {
 				continue
 			}
-			if i != 0 {
-				incrementNeighbourCount(neighbours[i-1], j)
-			}
-			neighbours[i][j]--
-			incrementNeighbourCount(neighbours[i], j)
-			if i != len(neighbours)-1 {
-				incrementNeighbourCount(neighbours[i+1], j)
-			}
+
+			incrementAround(neighbours, i, j)
 		}
 	}
+
 	return neighbours
 }
 
@@ -111,18 +107,35 @@ func countRolls(plan, neighbours [][]int64) int64 {
 		for j, n := range row {
 			if n != 0 && neighbours[i][j] < 4 {
 				result++
-				println("less4: ", i, j)
 			}
 		}
 	}
+
 	return result
 }
-func incrementNeighbourCount(row []int64, pos int) {
-	if pos > 0 {
-		row[pos-1]++
+
+func incrementAroundRow(row []int64, i int, withCenter bool) {
+	if i > 0 {
+		row[i-1]++
 	}
-	row[pos]++
-	if pos < len(row)-1 {
-		row[pos+1]++
+
+	if withCenter {
+		row[i]++
+	}
+
+	if i < len(row)-1 {
+		row[i+1]++
+	}
+}
+
+func incrementAround(rows [][]int64, i, j int) {
+	if i != 0 {
+		incrementAroundRow(rows[i-1], j, true)
+	}
+
+	incrementAroundRow(rows[i], j, false)
+
+	if i < len(rows[0])-1 {
+		incrementAroundRow(rows[i+1], j, true)
 	}
 }
